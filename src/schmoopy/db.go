@@ -38,12 +38,12 @@ func InitializeDb(
 
 type schmoopy struct {
 	name      string
-	imageUrls []string
+	imageUrls map[string]struct{}
 }
 
 func dbAddSchmoopy(conn *sqlite3.Conn, name string, imageUrl string) error {
 	args := sqlite3.NamedArgs{"$schmoopy": name, "$imageUrl": imageUrl}
-	sql := "INSERT INTO schmoopys(schmoopy, imageUrl) " +
+	sql := "INSERT OR IGNORE INTO schmoopys(schmoopy, imageUrl) " +
 		"VALUES ($schmoopy, $imageUrl)"
 	return conn.Exec(sql, args)
 }
@@ -55,7 +55,7 @@ func dbRemoveSchmoopy(conn *sqlite3.Conn, name string, imageUrl string) error {
 
 }
 
-func dbFetchSchmoopys(conn *sqlite3.Conn, names []string) ([]*schmoopy, error) {
+func dbFetchSchmoopys(conn *sqlite3.Conn, names []string) (map[string]*schmoopy, error) {
 	sql := "SELECT schmoopy, imageUrl FROM schmoopys"
 	args := sqlite3.NamedArgs{}
 	if len(names) > 0 {
@@ -63,12 +63,12 @@ func dbFetchSchmoopys(conn *sqlite3.Conn, names []string) ([]*schmoopy, error) {
 		sql += " WHERE schmoopy = $name"
 		args["$name"] = names[0]
 	}
-	ret := []*schmoopy{}
+	schmoopys := map[string]*schmoopy{}
 
 	rows, err := conn.Query(sql, args)
 
 	if err == io.EOF {
-		return ret, nil
+		return schmoopys, nil
 	} else if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,6 @@ func dbFetchSchmoopys(conn *sqlite3.Conn, names []string) ([]*schmoopy, error) {
 
 	var name string
 	var imageUrl string
-	schmoopys := map[string]*schmoopy{}
 
 	for {
 		err = rows.Scan(&name, &imageUrl)
@@ -89,11 +88,12 @@ func dbFetchSchmoopys(conn *sqlite3.Conn, names []string) ([]*schmoopy, error) {
 		sch, ok := schmoopys[name]
 		if !ok {
 			sch = &schmoopy{
-				name: name,
+				name:      name,
+				imageUrls: map[string]struct{}{},
 			}
 			schmoopys[name] = sch
 		}
-		sch.imageUrls = append(sch.imageUrls, imageUrl)
+		sch.imageUrls[imageUrl] = struct{}{}
 
 		err = rows.Next()
 
@@ -105,8 +105,5 @@ func dbFetchSchmoopys(conn *sqlite3.Conn, names []string) ([]*schmoopy, error) {
 		}
 	}
 
-	for _, val := range schmoopys {
-		ret = append(ret, val)
-	}
-	return ret, nil
+	return schmoopys, nil
 }

@@ -69,7 +69,7 @@ type dbAccessEvent struct {
 }
 
 type dbAccessResponse struct {
-	schmoopys []*schmoopy
+	schmoopys map[string]*schmoopy
 	err       error
 }
 
@@ -115,13 +115,10 @@ func (s *schmoopyServer) fetchSchmoopy(name string) (*schmoopy, error) {
 		return nil, err
 	}
 
-	if len(schmoopys) > 0 {
-		return schmoopys[0], nil
-	}
-	return nil, nil
+	return schmoopys[name], nil
 }
 
-func (s *schmoopyServer) fetchSchmoopys(names []string) ([]*schmoopy, error) {
+func (s *schmoopyServer) fetchSchmoopys(names []string) (map[string]*schmoopy, error) {
 	res := make(chan *dbAccessResponse, 1)
 	s.dbAccessChan <- &dbAccessEvent{
 		accessType: query,
@@ -138,7 +135,7 @@ func (s *schmoopyServer) fetchSchmoopys(names []string) ([]*schmoopy, error) {
 	}
 }
 
-func (s *schmoopyServer) fetchAllSchmoopys() ([]*schmoopy, error) {
+func (s *schmoopyServer) fetchAllSchmoopys() (map[string]*schmoopy, error) {
 	return s.fetchSchmoopys(nil)
 }
 
