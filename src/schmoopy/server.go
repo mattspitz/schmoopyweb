@@ -61,11 +61,11 @@ const (
 )
 
 type dbAccessEvent struct {
-	accessType  dbAccessType
-	queryNames  []string
-	addName     string
-	addImageUrl string
-	res         chan *dbAccessResponse // the result of the query
+	accessType        dbAccessType
+	queryNames        []string
+	addRemoveName     string
+	addRemoveImageUrl string
+	res               chan *dbAccessResponse // the result of the query
 }
 
 type dbAccessResponse struct {
@@ -90,12 +90,14 @@ func (s *schmoopyServer) serializeDbAccess() {
 
 			case add:
 				response = &dbAccessResponse{
-					err: dbAddSchmoopy(s.conn, event.addName, event.addImageUrl),
+					err: dbAddSchmoopy(s.conn, event.addRemoveName, event.addRemoveImageUrl),
 				}
 				break
 
 			case remove:
-				// TODO
+				response = &dbAccessResponse{
+					err: dbRemoveSchmoopy(s.conn, event.addRemoveName, event.addRemoveImageUrl),
+				}
 				break
 
 			default:
@@ -143,10 +145,25 @@ func (s *schmoopyServer) fetchAllSchmoopys() ([]*schmoopy, error) {
 func (s *schmoopyServer) addSchmoopy(name string, imageUrl string) error {
 	res := make(chan *dbAccessResponse, 1)
 	s.dbAccessChan <- &dbAccessEvent{
-		accessType:  add,
-		addName:     name,
-		addImageUrl: imageUrl,
-		res:         res,
+		accessType:        add,
+		addRemoveName:     name,
+		addRemoveImageUrl: imageUrl,
+		res:               res,
+	}
+
+	select {
+	case response := <-res:
+		return response.err
+	}
+}
+
+func (s *schmoopyServer) removeSchmoopy(name string, imageUrl string) error {
+	res := make(chan *dbAccessResponse, 1)
+	s.dbAccessChan <- &dbAccessEvent{
+		accessType:        remove,
+		addRemoveName:     name,
+		addRemoveImageUrl: imageUrl,
+		res:               res,
 	}
 
 	select {

@@ -39,5 +39,13 @@ func (s *schmoopyServer) addHandler(w http.ResponseWriter, r *http.Request) {
 
 /* API for removing a Schmoopy imageUrl */
 func (s *schmoopyServer) removeHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("remove"))
+	name := r.FormValue("name")
+	imageUrl := r.FormValue("imageUrl")
+
+	err := s.removeSchmoopy(name, imageUrl)
+	if err != nil {
+		w.Write([]byte(fmt.Sprintf("err: %v", err)))
+	} else {
+		w.Write([]byte(fmt.Sprintf("removed %v for %v", imageUrl, name)))
+	}
 }

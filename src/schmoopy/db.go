@@ -48,6 +48,13 @@ func dbAddSchmoopy(conn *sqlite3.Conn, name string, imageUrl string) error {
 	return conn.Exec(sql, args)
 }
 
+func dbRemoveSchmoopy(conn *sqlite3.Conn, name string, imageUrl string) error {
+	args := sqlite3.NamedArgs{"$schmoopy": name, "$imageUrl": imageUrl}
+	sql := "DELETE FROM schmoopys WHERE schmoopy = $schmoopy AND imageUrl = $imageUrl"
+	return conn.Exec(sql, args)
+
+}
+
 func dbFetchSchmoopys(conn *sqlite3.Conn, names []string) ([]*schmoopy, error) {
 	sql := "SELECT schmoopy, imageUrl FROM schmoopys"
 	args := sqlite3.NamedArgs{}
