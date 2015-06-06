@@ -41,40 +41,14 @@ type schmoopy struct {
 	imageUrls []string
 }
 
-/* TODO use a goroutine to seralize access */
-func (s *schmoopyServer) fetchSchmoopy(name string) (*schmoopy, error) {
-	return fetchSchmoopy(s.conn, name)
-}
-
-func (s *schmoopyServer) addSchmoopy(name string, imageUrl string) error {
-	return addSchmoopy(s.conn, name, imageUrl)
-}
-
-func addSchmoopy(conn *sqlite3.Conn, name string, imageUrl string) error {
+func dbAddSchmoopy(conn *sqlite3.Conn, name string, imageUrl string) error {
 	args := sqlite3.NamedArgs{"$schmoopy": name, "$imageUrl": imageUrl}
 	sql := "INSERT INTO schmoopys(schmoopy, imageUrl) " +
 		"VALUES ($schmoopy, $imageUrl)"
 	return conn.Exec(sql, args)
 }
 
-func fetchSchmoopy(conn *sqlite3.Conn, name string) (*schmoopy, error) {
-	schmoopys, err := fetch(conn, []string{name})
-
-	if err != nil {
-		return nil, err
-	}
-
-	if len(schmoopys) > 0 {
-		return schmoopys[0], nil
-	}
-	return nil, nil
-}
-
-func fetchAllSchmoopys(conn *sqlite3.Conn) ([]*schmoopy, error) {
-	return fetch(conn, nil)
-}
-
-func fetch(conn *sqlite3.Conn, names []string) ([]*schmoopy, error) {
+func dbFetchSchmoopys(conn *sqlite3.Conn, names []string) ([]*schmoopy, error) {
 	sql := "SELECT schmoopy, imageUrl FROM schmoopys"
 	args := sqlite3.NamedArgs{}
 	if len(names) > 0 {

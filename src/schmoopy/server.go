@@ -1,6 +1,7 @@
 package schmoopy
 
 import (
+	"log"
 	"net/http"
 
 	"code.google.com/p/go-sqlite/go1/sqlite3"
@@ -12,8 +13,9 @@ type SchmoopyServer interface {
 }
 
 type schmoopyServer struct {
-	conn *sqlite3.Conn
-	addr string
+	conn         *sqlite3.Conn
+	addr         string
+	dbAccessChan chan *dbAccessEvent
 }
 
 func NewSchmoopyServer(
@@ -25,10 +27,14 @@ func NewSchmoopyServer(
 		return nil, err
 	}
 
-	return &schmoopyServer{
-		conn: conn,
-		addr: addr,
-	}, nil
+	s := &schmoopyServer{
+		conn:         conn,
+		addr:         addr,
+		dbAccessChan: make(chan *dbAccessEvent),
+	}
+
+	go s.serializeDbAccess()
+	return s, nil
 }
 
 func (s *schmoopyServer) ListenAndServe() error {
@@ -44,4 +50,107 @@ func (s *schmoopyServer) ListenAndServe() error {
 	r.HandleFunc("/", s.indexHandler)
 
 	return http.ListenAndServe(s.addr, r)
+}
+
+type dbAccessType string
+
+const (
+	query  dbAccessType = "query"
+	add                 = "add"
+	remove              = "remove"
+)
+
+type dbAccessEvent struct {
+	accessType  dbAccessType
+	queryNames  []string
+	addName     string
+	addImageUrl string
+	res         chan *dbAccessResponse // the result of the query
+}
+
+type dbAccessResponse struct {
+	schmoopys []*schmoopy
+	err       error
+}
+
+func (s *schmoopyServer) serializeDbAccess() {
+	for {
+		select {
+		case event := <-s.dbAccessChan:
+			var response *dbAccessResponse
+
+			switch event.accessType {
+			case query:
+				schmoopys, err := dbFetchSchmoopys(s.conn, event.queryNames)
+				response = &dbAccessResponse{
+					schmoopys: schmoopys,
+					err:       err,
+				}
+				break
+
+			case add:
+				response = &dbAccessResponse{
+					err: dbAddSchmoopy(s.conn, event.addName, event.addImageUrl),
+				}
+				break
+
+			case remove:
+				// TODO
+				break
+
+			default:
+				log.Fatal("Unhandled access type: %v", event.accessType)
+			}
+
+			event.res <- response
+		}
+	}
+}
+
+func (s *schmoopyServer) fetchSchmoopy(name string) (*schmoopy, error) {
+	schmoopys, err := s.fetchSchmoopys([]string{name})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(schmoopys) > 0 {
+		return schmoopys[0], nil
+	}
+	return nil, nil
+}
+
+func (s *schmoopyServer) fetchSchmoopys(names []string) ([]*schmoopy, error) {
+	res := make(chan *dbAccessResponse, 1)
+	s.dbAccessChan <- &dbAccessEvent{
+		accessType: query,
+		queryNames: names,
+		res:        res,
+	}
+
+	select {
+	case response := <-res:
+		if response.err != nil {
+			return nil, response.err
+		}
+		return response.schmoopys, nil
+	}
+}
+
+func (s *schmoopyServer) fetchAllSchmoopys() ([]*schmoopy, error) {
+	return s.fetchSchmoopys(nil)
+}
+
+func (s *schmoopyServer) addSchmoopy(name string, imageUrl string) error {
+	res := make(chan *dbAccessResponse, 1)
+	s.dbAccessChan <- &dbAccessEvent{
+		accessType:  add,
+		addName:     name,
+		addImageUrl: imageUrl,
+		res:         res,
+	}
+
+	select {
+	case response := <-res:
+		return response.err
+	}
 }
