@@ -1,6 +1,7 @@
 package schmoopy
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -24,17 +25,34 @@ func (s *schmoopyServer) schmoopyHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+type apiResponse struct {
+	Ok  bool   `json:"ok,string"`
+	Err string `json:"err,omitempty"`
+}
+
+func writeApiResponse(w http.ResponseWriter, err error) {
+	response := apiResponse{
+		Ok: err == nil,
+	}
+	if err != nil {
+		response.Err = err.Error()
+	}
+
+	s, err := json.Marshal(response)
+	if err != nil {
+		w.Write([]byte(fmt.Sprintf("err: %v", err)))
+	} else {
+		w.Write(s)
+	}
+}
+
 /* API for adding a new Schmoopy imageUrl */
 func (s *schmoopyServer) addHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
 	imageUrl := r.FormValue("imageUrl")
 
 	err := s.addSchmoopy(name, imageUrl)
-	if err != nil {
-		w.Write([]byte(fmt.Sprintf("err: %v", err)))
-	} else {
-		w.Write([]byte(fmt.Sprintf("added %v for %v", imageUrl, name)))
-	}
+	writeApiResponse(w, err)
 }
 
 /* API for removing a Schmoopy imageUrl */
@@ -43,9 +61,5 @@ func (s *schmoopyServer) removeHandler(w http.ResponseWriter, r *http.Request) {
 	imageUrl := r.FormValue("imageUrl")
 
 	err := s.removeSchmoopy(name, imageUrl)
-	if err != nil {
-		w.Write([]byte(fmt.Sprintf("err: %v", err)))
-	} else {
-		w.Write([]byte(fmt.Sprintf("removed %v for %v", imageUrl, name)))
-	}
+	writeApiResponse(w, err)
 }
