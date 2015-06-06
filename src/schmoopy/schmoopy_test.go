@@ -179,7 +179,7 @@ func (s *SchmoopySuite) TestAddRemove(c *C) {
 		},
 	})
 
-	// removing not-the-last URL doesn't remove the schmoopy
+	// Removing not-the-last URL doesn't remove the schmoopy
 	c.Assert(s.server.removeSchmoopy("three", "url3"), IsNil)
 
 	schmoopys, err = s.server.fetchAllSchmoopys()
@@ -196,6 +196,35 @@ func (s *SchmoopySuite) TestAddRemove(c *C) {
 	c.Assert(*schmoopys["three"], DeepEquals, schmoopy{
 		name: "three",
 		imageUrls: map[string]struct{}{
+			"url4": struct{}{},
+		},
+	})
+}
+
+func (s *SchmoopySuite) TestFetchSchmoopys(c *C) {
+	err := s.server.addSchmoopy("one", "url1")
+	c.Assert(err, IsNil)
+	err = s.server.addSchmoopy("two", "url2")
+	c.Assert(err, IsNil)
+	err = s.server.addSchmoopy("three", "url3")
+	c.Assert(err, IsNil)
+	err = s.server.addSchmoopy("three", "url4")
+	c.Assert(err, IsNil)
+
+	schmoopys, err := dbFetchSchmoopys(s.server.conn, []string{"one", "three"})
+
+	c.Assert(schmoopys, HasLen, 2)
+
+	c.Assert(*schmoopys["one"], DeepEquals, schmoopy{
+		name: "one",
+		imageUrls: map[string]struct{}{
+			"url1": struct{}{},
+		},
+	})
+	c.Assert(*schmoopys["three"], DeepEquals, schmoopy{
+		name: "three",
+		imageUrls: map[string]struct{}{
+			"url3": struct{}{},
 			"url4": struct{}{},
 		},
 	})

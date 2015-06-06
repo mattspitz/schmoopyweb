@@ -1,11 +1,13 @@
 package schmoopy
 
 import (
-	"code.google.com/p/go-sqlite/go1/sqlite3"
 	"fmt"
 	"io"
 	"log"
 	"os"
+	"strings"
+
+	"code.google.com/p/go-sqlite/go1/sqlite3"
 )
 
 func InitializeDb(
@@ -57,15 +59,19 @@ func dbRemoveSchmoopy(conn *sqlite3.Conn, name string, imageUrl string) error {
 
 func dbFetchSchmoopys(conn *sqlite3.Conn, names []string) (map[string]*schmoopy, error) {
 	sql := "SELECT schmoopy, imageUrl FROM schmoopys"
-	args := sqlite3.NamedArgs{}
+	args := make([]interface{}, len(names))
+
 	if len(names) > 0 {
-		// TODO join on ,
-		sql += " WHERE schmoopy = $name"
-		args["$name"] = names[0]
+		params := make([]string, len(names))
+		for idx, name := range names {
+			params[idx] = "?"
+			args[idx] = name
+		}
+		sql += " WHERE schmoopy IN (" + strings.Join(params, ", ") + ")"
 	}
 	schmoopys := map[string]*schmoopy{}
 
-	rows, err := conn.Query(sql, args)
+	rows, err := conn.Query(sql, args...)
 
 	if err == io.EOF {
 		return schmoopys, nil
