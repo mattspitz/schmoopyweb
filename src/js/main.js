@@ -42,6 +42,7 @@ function upload(file) {
 }
 
 function apiRemoveSchmoopy(imageUrl) {
+    // TODO
 }
 
 function apiAddSchmoopy(imageUrl) {
@@ -78,4 +79,24 @@ function addSchmoopy(imageUrl) {
     $(img).appendTo(a);
     $(a).appendTo(div);
     $(".schmoopys").append(div);
+
+
+    function queueAnimation() {
+        var windowWidth = $(window).width();
+        var windowHeight = $(window).height();
+
+        var imgWidth = $(img).width();
+        var imgHeight = $(img).height();
+
+        var newLeft = Math.random()*(windowWidth-imgWidth);
+        var newTop = Math.random()*(windowHeight-imgHeight);
+
+        var newTime = Math.random()*(15000-3000)+3000;
+
+        $(div).animate({
+            left: newLeft,
+            top: newTop,
+        }, newTime, queueAnimation);
+    }
+    setTimeout(queueAnimation, 2000);
 }
