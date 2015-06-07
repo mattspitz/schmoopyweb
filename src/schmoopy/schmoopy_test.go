@@ -30,7 +30,7 @@ func (s *SchmoopySuite) SetUpTest(c *C) {
 
 	InitializeDb(s.dbFilename)
 
-	server, err := NewSchmoopyServer(s.dbFilename, "<addr>", "<templateDir>")
+	server, err := NewSchmoopyServer(s.dbFilename, "<addr>", "<templateDir>", "<staticDir>")
 	c.Assert(err, IsNil)
 
 	s.server = server.(*schmoopyServer)
@@ -50,8 +50,8 @@ func (s *SchmoopySuite) TestAdd(c *C) {
 
 	sch, err = s.server.fetchSchmoopy("present")
 	c.Assert(*sch, DeepEquals, schmoopy{
-		name: "present",
-		imageUrls: map[string]struct{}{
+		Name: "present",
+		ImageUrls: map[string]struct{}{
 			"with-url": struct{}{},
 		},
 	})
@@ -62,8 +62,8 @@ func (s *SchmoopySuite) TestAdd(c *C) {
 
 	sch, err = s.server.fetchSchmoopy("present")
 	c.Assert(*sch, DeepEquals, schmoopy{
-		name: "present",
-		imageUrls: map[string]struct{}{
+		Name: "present",
+		ImageUrls: map[string]struct{}{
 			"with-url":         struct{}{},
 			"with-another-url": struct{}{},
 		},
@@ -76,8 +76,8 @@ func (s *SchmoopySuite) TestAdd(c *C) {
 
 	sch, err = s.server.fetchSchmoopy("present")
 	c.Assert(*sch, DeepEquals, schmoopy{
-		name: "present",
-		imageUrls: map[string]struct{}{
+		Name: "present",
+		ImageUrls: map[string]struct{}{
 			"with-url":         struct{}{},
 			"with-another-url": struct{}{},
 		},
@@ -95,8 +95,8 @@ func (s *SchmoopySuite) TestRemoveMissing(c *C) {
 	c.Assert(schmoopys, HasLen, 1)
 
 	c.Assert(*schmoopys["one"], DeepEquals, schmoopy{
-		name: "one",
-		imageUrls: map[string]struct{}{
+		Name: "one",
+		ImageUrls: map[string]struct{}{
 			"url1": struct{}{},
 		},
 	})
@@ -110,8 +110,8 @@ func (s *SchmoopySuite) TestRemoveMissing(c *C) {
 	c.Assert(schmoopys, HasLen, 1)
 
 	c.Assert(*schmoopys["one"], DeepEquals, schmoopy{
-		name: "one",
-		imageUrls: map[string]struct{}{
+		Name: "one",
+		ImageUrls: map[string]struct{}{
 			"url1": struct{}{},
 		},
 	})
@@ -138,20 +138,20 @@ func (s *SchmoopySuite) TestAddRemove(c *C) {
 	c.Assert(schmoopys, HasLen, 3)
 
 	c.Assert(*schmoopys["one"], DeepEquals, schmoopy{
-		name: "one",
-		imageUrls: map[string]struct{}{
+		Name: "one",
+		ImageUrls: map[string]struct{}{
 			"url1": struct{}{},
 		},
 	})
 	c.Assert(*schmoopys["two"], DeepEquals, schmoopy{
-		name: "two",
-		imageUrls: map[string]struct{}{
+		Name: "two",
+		ImageUrls: map[string]struct{}{
 			"url2": struct{}{},
 		},
 	})
 	c.Assert(*schmoopys["three"], DeepEquals, schmoopy{
-		name: "three",
-		imageUrls: map[string]struct{}{
+		Name: "three",
+		ImageUrls: map[string]struct{}{
 			"url3": struct{}{},
 			"url4": struct{}{},
 		},
@@ -166,14 +166,14 @@ func (s *SchmoopySuite) TestAddRemove(c *C) {
 	c.Assert(schmoopys, HasLen, 2)
 
 	c.Assert(*schmoopys["one"], DeepEquals, schmoopy{
-		name: "one",
-		imageUrls: map[string]struct{}{
+		Name: "one",
+		ImageUrls: map[string]struct{}{
 			"url1": struct{}{},
 		},
 	})
 	c.Assert(*schmoopys["three"], DeepEquals, schmoopy{
-		name: "three",
-		imageUrls: map[string]struct{}{
+		Name: "three",
+		ImageUrls: map[string]struct{}{
 			"url3": struct{}{},
 			"url4": struct{}{},
 		},
@@ -188,14 +188,14 @@ func (s *SchmoopySuite) TestAddRemove(c *C) {
 	c.Assert(schmoopys, HasLen, 2)
 
 	c.Assert(*schmoopys["one"], DeepEquals, schmoopy{
-		name: "one",
-		imageUrls: map[string]struct{}{
+		Name: "one",
+		ImageUrls: map[string]struct{}{
 			"url1": struct{}{},
 		},
 	})
 	c.Assert(*schmoopys["three"], DeepEquals, schmoopy{
-		name: "three",
-		imageUrls: map[string]struct{}{
+		Name: "three",
+		ImageUrls: map[string]struct{}{
 			"url4": struct{}{},
 		},
 	})
@@ -216,14 +216,14 @@ func (s *SchmoopySuite) TestFetchSchmoopys(c *C) {
 	c.Assert(schmoopys, HasLen, 2)
 
 	c.Assert(*schmoopys["one"], DeepEquals, schmoopy{
-		name: "one",
-		imageUrls: map[string]struct{}{
+		Name: "one",
+		ImageUrls: map[string]struct{}{
 			"url1": struct{}{},
 		},
 	})
 	c.Assert(*schmoopys["three"], DeepEquals, schmoopy{
-		name: "three",
-		imageUrls: map[string]struct{}{
+		Name: "three",
+		ImageUrls: map[string]struct{}{
 			"url3": struct{}{},
 			"url4": struct{}{},
 		},
