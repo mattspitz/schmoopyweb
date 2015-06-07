@@ -30,7 +30,7 @@ func (s *SchmoopySuite) SetUpTest(c *C) {
 
 	InitializeDb(s.dbFilename)
 
-	server, err := NewSchmoopyServer(s.dbFilename, "<addr>")
+	server, err := NewSchmoopyServer(s.dbFilename, "<addr>", "<templateDir>")
 	c.Assert(err, IsNil)
 
 	s.server = server.(*schmoopyServer)

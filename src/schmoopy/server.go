@@ -15,12 +15,14 @@ type SchmoopyServer interface {
 type schmoopyServer struct {
 	conn         *sqlite3.Conn
 	addr         string
+	templateDir  string
 	dbAccessChan chan *dbAccessEvent
 }
 
 func NewSchmoopyServer(
 	dbFilename string,
 	addr string,
+	templateDir string,
 ) (SchmoopyServer, error) {
 	conn, err := sqlite3.Open(dbFilename)
 	if err != nil {
@@ -30,6 +32,7 @@ func NewSchmoopyServer(
 	s := &schmoopyServer{
 		conn:         conn,
 		addr:         addr,
+		templateDir:  templateDir,
 		dbAccessChan: make(chan *dbAccessEvent),
 	}
 

@@ -1,0 +1,14 @@
+<html>
+    <head>
+        <title>schmoopy.website</title>
+    </head>
+    <body>
+        {{range .schmoopys}}
+        <div class="schmoopy">
+            <a href="/{{.Name}}">{{.Name}}</a>
+        </div>
+        {{else}}
+            No Schmoopys?! Go to /&lt;something&gt; to create one.
+        {{end}}
+    </body>
+</html>

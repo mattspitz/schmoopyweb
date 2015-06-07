@@ -18,15 +18,20 @@ func main() {
 	var dbFilename string
 	var initDb bool
 	var addr string
+	var templateDir string
 
 	flag.StringVar(&dbFilename, "db", required, "Filename for sqlite3 database.")
 	flag.BoolVar(&initDb, "init", false, "If true, initializes the sqlite3 database")
 	flag.StringVar(&addr, "addr", ":8080", "The TCP network address on which to run.")
+	flag.StringVar(&templateDir, "templateDir", required, "The location of HTML templates for rendering schmoopies.")
 
 	flag.Parse()
 
 	if dbFilename == required {
 		log.Fatal(errors.New("-db is required!"))
+	}
+	if templateDir == required {
+		log.Fatal(errors.New("-templateDir is required!"))
 	}
 
 	if initDb {
@@ -38,7 +43,7 @@ func main() {
 		log.Fatal(fmt.Errorf("File doesn't exist and we're not meant to initialize the database!: %v", dbFilename))
 	}
 
-	s, err := schmoopy.NewSchmoopyServer(dbFilename, addr)
+	s, err := schmoopy.NewSchmoopyServer(dbFilename, addr, templateDir)
 	if err != nil {
 		log.Fatal(err)
 	}

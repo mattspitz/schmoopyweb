@@ -1,0 +1,15 @@
+<html>
+    <head>
+        <title>schmoopy.website/{{.schmoopy.Name}}</title>
+    </head>
+    <body>
+        <div class="schmoopy-name">
+            {{.schmoopy.Name}}
+        </div>
+        {{range $url, $_ := .schmoopy.ImageUrls}}
+            <div class="schmoopy-img">
+                <img src="{{$url}}"/>
+            </div>
+        {{end}}
+    </body>
+</html>

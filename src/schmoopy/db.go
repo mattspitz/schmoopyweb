@@ -39,8 +39,8 @@ func InitializeDb(
 }
 
 type schmoopy struct {
-	name      string
-	imageUrls map[string]struct{}
+	Name      string
+	ImageUrls map[string]struct{}
 }
 
 func dbAddSchmoopy(conn *sqlite3.Conn, name string, imageUrl string) error {
@@ -94,12 +94,12 @@ func dbFetchSchmoopys(conn *sqlite3.Conn, names []string) (map[string]*schmoopy,
 		sch, ok := schmoopys[name]
 		if !ok {
 			sch = &schmoopy{
-				name:      name,
-				imageUrls: map[string]struct{}{},
+				Name:      name,
+				ImageUrls: map[string]struct{}{},
 			}
 			schmoopys[name] = sch
 		}
-		sch.imageUrls[imageUrl] = struct{}{}
+		sch.ImageUrls[imageUrl] = struct{}{}
 
 		err = rows.Next()
 
