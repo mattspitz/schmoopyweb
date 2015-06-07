@@ -32,9 +32,6 @@ func main() {
 	if dbFilename == required {
 		log.Fatal(errors.New("-db is required!"))
 	}
-	if templateDir == required {
-		log.Fatal(errors.New("-templateDir is required!"))
-	}
 
 	if initDb {
 		if err := schmoopy.InitializeDb(dbFilename); err != nil {
@@ -43,6 +40,10 @@ func main() {
 		return
 	} else if _, err := os.Stat(dbFilename); os.IsNotExist(err) {
 		log.Fatal(fmt.Errorf("File doesn't exist and we're not meant to initialize the database!: %v", dbFilename))
+	}
+
+	if templateDir == required {
+		log.Fatal(errors.New("-templateDir is required!"))
 	}
 
 	s, err := schmoopy.NewSchmoopyServer(dbFilename, addr, templateDir, staticDir)
