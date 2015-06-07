@@ -20,6 +20,7 @@ body {
     display: inline-block;
     width: 15%;
     position: relative;
+    margin: 4px;
 }
 
 .tile img {
@@ -45,11 +46,10 @@ body {
     text-align: center;
     line-height: 22px;
     width: 220px;
-    margin: auto;
     font-size: 20px;
     position: absolute;
-    right: 10;
-    top: 10;
+    bottom: 10;
+    left: 10;
 }
 
 .upload-box .header {
