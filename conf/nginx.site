@@ -1,0 +1,33 @@
+server {
+    listen 80;
+    server_name schmoopy.website;
+
+    location /static/ {
+        root "/var/www/schmoopy.website/static/";
+        access_log /var/log/nginx/schmoopy.website/access.log;
+
+        add_header Pragma public;
+        add_header Cache-Control "public";
+
+        # poor man's asset pipelining; cache the images for a week and everything else for 4 hours
+        location ~* \.(?:gif|jpe?g|png)$ {
+            expires 7d;
+        }
+        location / {
+            expires 4h;
+        }
+    }
+    location / {
+        proxy_pass http://localhost:5050/;
+    }
+}
+
+# redirect www.schmoopy.website to schmoopy.website
+server {
+    listen 80;
+    server_name www.schmoopy.website;
+
+    access_log off;
+
+    return 301 http://schmoopy.website/;
+}
