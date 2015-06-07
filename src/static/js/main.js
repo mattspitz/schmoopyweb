@@ -98,5 +98,7 @@ function addSchmoopy(imageUrl) {
             top: newTop,
         }, newTime, queueAnimation);
     }
-    setTimeout(queueAnimation, 2000);
+
+    var startDelay = Math.random()*(3000-750)+750;
+    setTimeout(queueAnimation, startDelay);
 }
