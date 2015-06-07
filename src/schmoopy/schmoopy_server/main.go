@@ -19,11 +19,13 @@ func main() {
 	var initDb bool
 	var addr string
 	var templateDir string
+	var staticDir string
 
 	flag.StringVar(&dbFilename, "db", required, "Filename for sqlite3 database.")
 	flag.BoolVar(&initDb, "init", false, "If true, initializes the sqlite3 database")
 	flag.StringVar(&addr, "addr", ":8080", "The TCP network address on which to run.")
 	flag.StringVar(&templateDir, "templateDir", required, "The location of HTML templates for rendering schmoopies.")
+	flag.StringVar(&staticDir, "staticDir", "", "The location of static files to be served at /static/ (optional)")
 
 	flag.Parse()
 
@@ -43,7 +45,7 @@ func main() {
 		log.Fatal(fmt.Errorf("File doesn't exist and we're not meant to initialize the database!: %v", dbFilename))
 	}
 
-	s, err := schmoopy.NewSchmoopyServer(dbFilename, addr, templateDir)
+	s, err := schmoopy.NewSchmoopyServer(dbFilename, addr, templateDir, staticDir)
 	if err != nil {
 		log.Fatal(err)
 	}

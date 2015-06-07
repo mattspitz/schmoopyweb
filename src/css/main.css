@@ -1,0 +1,50 @@
+body {
+    background: url("/static/img/background.jpg");
+    background-size:   cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.schmoopys {
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.schmoopy {
+    display: inline;
+}
+.schmoopy img {
+    width: 25%;
+    border: 2px solid white;
+}
+
+.upload-box {
+    border: 10px solid #00FFCC;
+    background: #FFEE00;
+    text-align: center;
+    line-height: 22px;
+    width: 200px;
+    margin: auto;
+    font-size: 20px;
+    position: absolute;
+    right: 10;
+    bottom: 10;
+}
+
+.progress {
+    display: none;
+}
+
+.uploading .progress {
+    display: block;
+}
+
+.uploading .progress img {
+    width: 48px;
+}
+
+.uploading .prompt {
+    display: none;
+}

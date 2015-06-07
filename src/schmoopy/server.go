@@ -16,6 +16,7 @@ type schmoopyServer struct {
 	conn         *sqlite3.Conn
 	addr         string
 	templateDir  string
+	staticDir    string
 	dbAccessChan chan *dbAccessEvent
 }
 
@@ -23,6 +24,7 @@ func NewSchmoopyServer(
 	dbFilename string,
 	addr string,
 	templateDir string,
+	staticDir string,
 ) (SchmoopyServer, error) {
 	conn, err := sqlite3.Open(dbFilename)
 	if err != nil {
@@ -33,6 +35,7 @@ func NewSchmoopyServer(
 		conn:         conn,
 		addr:         addr,
 		templateDir:  templateDir,
+		staticDir:    staticDir,
 		dbAccessChan: make(chan *dbAccessEvent),
 	}
 
@@ -48,6 +51,12 @@ func (s *schmoopyServer) ListenAndServe() error {
 		Subrouter()
 	api.HandleFunc("/add", s.addHandler)
 	api.HandleFunc("/remove", s.removeHandler)
+
+	if s.staticDir != "" {
+		fs := http.FileServer(http.Dir(s.staticDir))
+		r.PathPrefix("/static/").
+			Handler(http.StripPrefix("/static/", fs))
+	}
 
 	r.HandleFunc("/{schmoopy}", s.schmoopyHandler)
 	r.HandleFunc("/", s.indexHandler)

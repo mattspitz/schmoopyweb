@@ -58,15 +58,24 @@ func (s *schmoopyServer) schmoopyHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	} else if schmoopy != nil {
+		imageUrls := []string{}
+		for url, _ := range schmoopy.imageUrls {
+			imageUrls = append(imageUrls, url)
+		}
+		for i := range imageUrls {
+			j := rand.Intn(i + 1)
+			imageUrls[i], imageUrls[j] = imageUrls[j], imageUrls[i]
+		}
 		data := map[string]interface{}{
-			"schmoopy": schmoopy,
+			"name":      name,
+			"imageUrls": imageUrls,
 		}
 		s.renderTemplate(w, "schmoopy.html", data)
 	} else {
 		data := map[string]interface{}{
 			"name": name,
 		}
-		s.renderTemplate(w, "create.html", data)
+		s.renderTemplate(w, "schmoopy.html", data)
 	}
 }
 

@@ -1,7 +1,25 @@
 <html>
     <head>
         <title>schmoopy.website/{{.name}}</title>
+
+        <!-- TODO: use a sub-template for these includes. -->
+        <link href="/static/css/main.css" rel="stylesheet">
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js" type="text/javascript"></script>
+        <script src="/static/js/main.js" type="text/javascript"></script>
     </head>
     <body>
+        <div class="schmoopys"></div>
+
+        <div class="upload-box">
+            <div class="prompt">
+                DROP!
+                <button onclick="document.querySelector('input').click()">Or click</button>
+                <input style="visibility: collapse; width: 0px;" type="file" onchange="upload(this.files[0])">
+            </div>
+            <div class="progress">
+                <img src="/static/img/spinner.gif"/>
+            </div>
+        </div>
     </body>
 </html>
