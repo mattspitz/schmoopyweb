@@ -11,7 +11,12 @@
     <body>
         {{range .schmoopys}}
         <div class="schmoopy">
-            <a href="/{{.Name}}">{{.Name}}</a>
+            <a href="/{{.Name}}">
+                <img src="{{.RandomImageUrl}}"/>
+            </a>
+            <div class="overlay">
+                {{.Name}}
+            </div>
         </div>
         {{else}}
             No Schmoopys?! Go to /&lt;something&gt; to create one.

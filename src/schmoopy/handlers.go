@@ -59,7 +59,7 @@ func (s *schmoopyServer) schmoopyHandler(w http.ResponseWriter, r *http.Request)
 		return
 	} else if schmoopy != nil {
 		imageUrls := []string{}
-		for url, _ := range schmoopy.imageUrls {
+		for url, _ := range schmoopy.ImageUrls {
 			imageUrls = append(imageUrls, url)
 		}
 		for i := range imageUrls {

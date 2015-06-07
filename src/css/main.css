@@ -3,6 +3,7 @@ body {
     background-size:   cover;
     background-repeat: no-repeat;
     background-position: center center;
+    font-family: "Comic Sans MS", cursive, sans-serif;
 }
 
 .schmoopys {
@@ -14,10 +15,22 @@ body {
 
 .schmoopy {
     display: inline;
+    position: relative;
 }
 .schmoopy img {
     width: 25%;
     border: 2px solid white;
+    vertical-align: middle;
+}
+
+.schmoopy .overlay {
+    color: #FF00FF;
+    font-size: 32px;
+    font-weight: 600;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .upload-box {
@@ -25,12 +38,17 @@ body {
     background: #FFEE00;
     text-align: center;
     line-height: 22px;
-    width: 200px;
+    width: 220px;
     margin: auto;
     font-size: 20px;
     position: absolute;
     right: 10;
-    bottom: 10;
+    top: 10;
+}
+
+.upload-box .header {
+    font-size: 12px;
+    line-height: 22px;
 }
 
 .progress {
